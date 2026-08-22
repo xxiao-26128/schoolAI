@@ -25,7 +25,21 @@ A teacher picks an audience (a classroom, a specific student within it, or every
 
 ## Getting started
 
+Run `./dev.sh` from the repo root — it installs both projects' dependencies if needed (Python venv + pip, `npm install`), starts the backend and frontend together, and opens the app in your browser. Ctrl+C stops both.
+
+For running each side individually:
 - Frontend: see [frontend/package.json](frontend/package.json) scripts (`npm run dev`, `npm run build`, `npm run lint`).
-- Backend: see [backend/requirements.txt](backend/requirements.txt); run tests with `pytest` from within `backend/`.
+- Backend: see [backend/requirements.txt](backend/requirements.txt).
+
+## Testing
+
+**Backend:**
+```
+cd backend
+python3 -m venv .venv && .venv/bin/pip install -r requirements.txt   # first time only
+.venv/bin/python -m pytest -v
+```
+
+**Frontend:** no test runner is configured yet. `npm run lint` (Oxlint) and `npm run build` (type-checks via `tsc -b`) are the current checks — run both from `frontend/` after any change.
 
 See [.claude/CLAUDE.md](.claude/CLAUDE.md) for detailed setup commands and architecture notes on both projects.

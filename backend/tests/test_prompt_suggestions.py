@@ -14,5 +14,5 @@ def test_prompt_suggestions_returns_expected_items():
     items = client.get("/api/v1/prompts").json()["items"]
     assert items == [
         {"id": "p1", "title": "Show me student detail"},
-        {"id": "p2", "title": "Prompt"},
+        {"id": "p2", "title": "create a new study plan"},
     ]
