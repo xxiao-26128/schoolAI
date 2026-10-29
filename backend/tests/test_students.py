@@ -1,3 +1,6 @@
+import base64
+
+import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
@@ -87,6 +90,19 @@ def test_students_pagination_disambiguates_duplicate_names_at_limit_one():
 
 def test_students_invalid_cursor_returns_400():
     response = client.get("/api/v1/students", params={"cursor": "not-a-real-cursor"})
+    assert response.status_code == 400
+
+
+# Cursors that decode cleanly as base64 JSON but don't hold a string
+# (name, id) position — these must still be rejected as client errors
+# rather than blowing up the (name, id) comparison with a 500.
+@pytest.mark.parametrize(
+    "payload",
+    ['{"name": 1, "id": 2}', '["Jane Doe", "student-jane-3b"]', "{}"],
+)
+def test_students_well_formed_but_invalid_cursor_returns_400(payload: str):
+    cursor = base64.urlsafe_b64encode(payload.encode("utf-8")).decode("ascii")
+    response = client.get("/api/v1/students", params={"cursor": cursor})
     assert response.status_code == 400
 
 

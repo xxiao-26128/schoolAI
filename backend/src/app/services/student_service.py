@@ -22,9 +22,17 @@ def _encode_cursor(student: Student) -> str:
 def _decode_cursor(cursor: str) -> tuple[str, str]:
     try:
         payload = json.loads(base64.urlsafe_b64decode(cursor.encode("ascii")))
-        return payload["name"], payload["id"]
-    except Exception as exc:
+    except ValueError as exc:  # base64, UTF-8, and JSON errors all subclass ValueError
         raise InvalidCursorError(cursor) from exc
+
+    # A cursor can be valid base64 JSON yet not a (name, id) position; reject
+    # it here so a non-string value can't crash the sort-key comparison.
+    if not isinstance(payload, dict):
+        raise InvalidCursorError(cursor)
+    name, student_id = payload.get("name"), payload.get("id")
+    if not isinstance(name, str) or not isinstance(student_id, str):
+        raise InvalidCursorError(cursor)
+    return name, student_id
 
 
 class StudentService:
